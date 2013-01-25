@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"> 
+	<head>
+		<title>Mini Stream Player</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="../css/streamPlayer.css" />
+		<script type="text/javascript" src="../streamPlayer.js"></script>
+		<style>
+			body {
+			  font-family: "Helvetica Neue", Helvetica, sans-serif;
+			  margin: 1em 10em 4em 10em;
+			  width: 500px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Mini Stream Player</h1>
+		<div id="simple-stream-player">
+			<input type="button" class="command pause" value="pause" title="play/pause"/>
+		</div>
+		<div id="random-values"></div>
+
+		<script type="text/javascript">
+
+		var intervalId; 
+		function rand_generator(start) {
+			if(start) {
+				intervalId = setInterval(function() { document.getElementById('random-values').innerHTML += Math.random()+"<br/>";}, 500);
+			} else {
+				clearInterval(intervalId);
+			}
+		}
+
+		rand_generator(true);
+
+		var sp = new StreamPlayer('simple-stream-player', {
+					playCallback: function() {
+						rand_generator(true);
+					},
+					pauseCallback: function() {
+						rand_generator(false);
+					}
+				});
+		</script>
+	</body>
+</html>

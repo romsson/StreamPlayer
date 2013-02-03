@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"> 
+	<head>
+		<title>Basic Stream Player</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="../css/streamPlayer.css" />
+		<script type="text/javascript" src="../streamPlayer.js"></script>
+		<style>
+			body {
+			  font-family: "Helvetica Neue", Helvetica, sans-serif;
+			  margin: 1em 10em 4em 10em;
+			  width: 500px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Basic Stream Player</h1>
+		<div id="simple-stream-player">
+			<input type="button" class="command prev" value="prev" title="prev element"/>	
+			<input type="button" class="command fb" value="fb" title="fast backward"/>			
+			<input type="button" class="command stop" value="stop" title="stop"/>		
+			<input type="button" class="command pause" value="pause" title="play/pause"/>
+			<input type="button" class="command ff" value="fb" title="fast forward"/>		
+			<input type="button" class="command next" value="next" title="next element"/>	
+		</div>
+		<div id="random-values"></div>
+
+		<script type="text/javascript">
+
+		var sp = new StreamPlayer('simple-stream-player', {
+					current_time: function() { 
+						var div = document.getElementById('random-values');
+						return div.childNodes.length;
+					},
+					current_speed: 500,
+					updateCallback: function() {
+
+						var elem = document.createElement('div');
+
+						elem.innerHTML = Math.random();
+						document.getElementById('random-values').appendChild(elem);
+					},
+					playCallback: function() {
+					},
+					pauseCallback: function() {
+					},
+					stopCallback: function() {
+
+						var div = document.getElementById('random-values');
+
+						while(div.childNodes.length > 0) {
+							var lastChild = div.lastChild;
+							document.getElementById('random-values').removeChild(lastChild);
+						}
+					},
+					nextCallback: function(self) {
+
+						var elem = document.createElement('div');
+						elem.innerHTML = Math.random();
+						document.getElementById('random-values').appendChild(elem);
+					},
+					previousCallback: function(self) {
+
+						var div = document.getElementById('random-values');
+
+						if(div.childNodes.length > 0) {
+							var lastChild = div.lastChild;
+							document.getElementById('random-values').removeChild(lastChild);
+						}
+
+					},
+					ffCallback: function() {
+					},
+					fbCallback: function() {
+					}
+				});
+
+		</script>
+	</body>
+</html>

@@ -19,20 +19,15 @@
 			<input type="button" class="command pause" value="pause" title="play/pause"/>
 		</div>
 		<div id="random-values"></div>
-
 		<script type="text/javascript">
-
 		var intervalId; 
 		function rand_generator(start) {
-			if(start) {
-				intervalId = setInterval(function() { document.getElementById('random-values').innerHTML += Math.random()+"<br/>";}, 500);
-			} else {
-				clearInterval(intervalId);
-			}
+			if(start)
+				intervalId = setInterval(function() { document.getElementById('random-values').innerHTML += Math.random()+"<br/>";}, 500;
+			else
+			clearInterval(intervalId);
 		}
-
 		rand_generator(true);
-
 		var sp = new StreamPlayer('simple-stream-player', {
 					playCallback: function() {
 						rand_generator(true);

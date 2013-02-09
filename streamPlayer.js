@@ -1,5 +1,5 @@
 /**
- * StreamPlayer 0.1
+ * StreamPlayer 0.11
  * Romain Vuillemot
  */
 var StreamPlayer = function(player, options) {
@@ -46,29 +46,30 @@ StreamPlayer.prototype.init = function(player, handle, options) {
 	
 	this.addListeners();
 
-	this.max_speed = 4000;
-	this.min_speed = 100;
+	this.min_speed = options.min_speed || 4000;
+	this.max_speed = options.max_speed || 100;
+
+	this.min_time = options.min_time || 0;
+	this.max_time = options.max_time || -1;
 
 	self = this;
 }
 	
 StreamPlayer.prototype.addListeners = function() {
-
 	this.player.onclick = function(e) {
-
 		if(e.target.className.search(/(^|\s)stop(\s|$)/) != -1 && typeof(self.stopCallback) == 'function') {
 			self.stopCallback(self);
 			self.update();
-
 		} else if(e.target.className.search(/(^|\s)play(\s|$)/) != -1 && typeof(self.playCallback) == 'function') {
 			self.playCallback(self);
 			e.target.className = e.target.className.replace(/\s?play/g, '');
 			e.target.className += " pause";
 			self.is_buffering = false;
 			self.is_playing = !self.is_playing;
-			self.refreshIntervalId = setInterval(function () {return self.updateCallback(self);}, self.current_speed);
-			self.update();
-
+			self.refreshIntervalId = setInterval(function () {
+				self.updateCallback(self)
+				self.update();
+			}, self.current_speed);
 		} else if(e.target.className.search(/(^|\s)pause(\s|$)/) != -1 && typeof(self.pauseCallback) == 'function') {
 			self.pauseCallback();
 			e.target.className = e.target.className.replace(/\s?pause/g, '');
@@ -76,26 +77,22 @@ StreamPlayer.prototype.addListeners = function() {
 			clearInterval(self.refreshIntervalId);
 			self.is_playing = !self.is_playing;
 			self.update();
-				
 		} else if(e.target.className.search(/(^|\s)next(\s|$)/) != -1 && typeof(self.nextCallback) == 'function') {
 			self.nextCallback(self);
 			self.update();
-
 		} else if(e.target.className.search(/(^|\s)prev(\s|$)/) != -1 && typeof(self.previousCallback) == 'function') {
 			self.previousCallback(self);
 			self.update();
-
 		} else if(e.target.className.search(/(^|\s)ff(\s|$)/) != -1 && typeof(self.ffCallback) == 'function') {
+			if(self.current_speed>self.max_speed) {
 
-			if(self.current_speed<self.max_speed) {
-				self.current_speed=self.current_speed/2;
+				self.current_speed = self.current_speed/2 > self.max_speed ? self.current_speed/2 : self.max_speed;
 
 				if(self.is_playing) {
 					clearInterval(self.refreshIntervalId);
 					self.refreshIntervalId = setInterval(function () {
 						self.updateCallback(self);
 						self.update();
-						return ;
 					}, self.current_speed);
 				}
 
@@ -104,19 +101,17 @@ StreamPlayer.prototype.addListeners = function() {
 				document.getElementsByClassName("fb")[0].className = document.getElementsByClassName("fb")[0].className.replace(/\s?disabled/g, '');
 				document.getElementsByClassName("fb")[0].disabled = false;
 			}
-
-			if(self.current_speed==self.max_speed) {
+			if(self.current_speed<=self.max_speed) {
 				if(e.target.className.search(/(^|\s)disabled(\s|$)/) == -1) {
 					e.target.className += " disabled";
 					e.target.disabled = true;
 				}
 			}
-
 		} else if(e.target.className.search(/(^|\s)fb(\s|$)/) != -1 && typeof(self.fbCallback) == 'function') {
 			
-			if(self.current_speed>self.min_speed) {
+			if(self.current_speed<self.min_speed) {
 
-				self.current_speed=self.current_speed*2;
+				self.current_speed = self.current_speed*2 < self.min_speed ? self.current_speed*2 : self.min_speed;
 
 				if(self.is_playing) {
 					clearInterval(self.refreshIntervalId);
@@ -127,7 +122,6 @@ StreamPlayer.prototype.addListeners = function() {
 					}, self.current_speed);
 				}
 				e.target.className.replace(/\s?disabled/g, '');
-
 				self.fbCallback();
 				document.getElementsByClassName("ff")[0].className = document.getElementsByClassName("ff")[0].className.replace(/\s?disabled/g, '');
 				document.getElementsByClassName("ff")[0].disabled = false;
@@ -147,17 +141,14 @@ StreamPlayer.prototype.addListeners = function() {
 StreamPlayer.prototype.setup = function() {
 	this.addListeners();
 	this.update();
-
 	if((self.current_speed==self.min_speed) && document.getElementsByClassName("fb").length > 1 && document.getElementsByClassName("fb")[0].className.search(/(^|\s)disabled(\s|$)/) == -1) {
 		document.getElementsByClassName("fb")[0].className += " disabled";
 		document.getElementsByClassName("fb")[0].disabled = false;
 	}
-
 	if((self.current_speed==self.min_speed) && document.getElementsByClassName("fb").length > 1 && document.getElementsByClassName("fb")[0].className.search(/(^|\s)disabled(\s|$)/) == -1) {
 		document.getElementsByClassName("fb")[0].className += " disabled";
 		document.getElementsByClassName("fb")[0].disabled = false;
 	}
-
 	if(typeof(self.current_time) == 'function' && self.current_time()==0) {
 		if(document.getElementsByClassName("prev").length>0 && document.getElementsByClassName("prev")[0].className.search(/(^|\s)disabled(\s|$)/) == -1) {
 			document.getElementsByClassName("prev")[0].className += " disabled";
@@ -183,7 +174,7 @@ StreamPlayer.prototype.update = function() {
 			return ;
 		}, self.current_speed);
 	}
-	if(typeof(self.current_time) == 'function' && self.current_time()==0) {
+	if(typeof(self.current_time) == 'function' && self.current_time()==self.min_time) {
 		if(document.getElementsByClassName("prev").length>0 && document.getElementsByClassName("prev")[0].className.search(/(^|\s)disabled(\s|$)/) == -1) {
 			document.getElementsByClassName("prev")[0].className += " disabled";
 			document.getElementsByClassName("prev")[0].disabled = true;
@@ -194,6 +185,27 @@ StreamPlayer.prototype.update = function() {
 			document.getElementsByClassName("prev")[0].disabled = false;
 		}
 	}
+	if(typeof(self.current_time) == 'function' && self.current_time()==self.max_time) {
+		if(document.getElementsByClassName("next").length>0 && document.getElementsByClassName("next")[0].className.search(/(^|\s)disabled(\s|$)/) == -1) {
+			document.getElementsByClassName("next")[0].className += " disabled";
+			document.getElementsByClassName("next")[0].disabled = true;
+		}
+		if(self.is_playing) {
+			self.pauseCallback();
+			var el = document.getElementsByClassName("pause")[0];
+			el.className = el.className.replace(/\s?pause/g, '');
+			el.className += " play";
+			clearInterval(self.refreshIntervalId);
+			self.is_playing = !self.is_playing;
+			self.update();
+		}
+	} else {
+		if(document.getElementsByClassName("next").length>0 && document.getElementsByClassName("next")[0].className.search(/(^|\s)disabled(\s|$)/)>0) {
+			document.getElementsByClassName("next")[0].className = document.getElementsByClassName("next")[0].className.replace(/\s?disabled/g, '');
+			document.getElementsByClassName("next")[0].disabled = false;
+		}
+	}
+	self.refreshCallback(self);
 }
 
 StreamPlayer.prototype.refreshCallback = function() {

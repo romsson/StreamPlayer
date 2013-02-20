@@ -8,36 +8,36 @@
 	width: 26px;
 	height: 26px;
 	line-height: 1 !important;
-	background: transparent url(../img/play.png) no-repeat scroll 0 0;
+	background-image: url(../img/controls.png);
 	overflow: hidden;
 	cursor: pointer;
 }
 .play {
-	background: transparent url(../img/play.png) no-repeat scroll 0 0;
+	background-position: -48px 0px;
 }
 .pause {
-	background: transparent url(../img/pause.png) no-repeat scroll 0 0;
+	background-position: -48px -24px;
 }
 .stop {
-	background: transparent url(../img/stop.png) no-repeat scroll 0 0;
+	background-position: -72px 0px;
 }
 .fb {
-	background: transparent url(../img/fb.png) no-repeat scroll 0 0;
+	background-position: 0px 0px;
 }
 .ff {
-	background: transparent url(../img/ff.png) no-repeat scroll 0 0;
+	background-position: -120px 0px;
 }
 .prev {
-	background: transparent url(../img/prev.png) no-repeat scroll 0 0;
+	background-position: -24px 0px;
 }
 .next {
-	background: transparent url(../img/next.png) no-repeat scroll 0 0;
+	background-position: -96px 0px;
 }
 .soundon {
-	background: transparent url(../img/soundon.png) no-repeat scroll 0 0;
+	background-position: -144px 0px;
 }
 .soundoff {
-	background: transparent url(../img/soundoff.png) no-repeat scroll 0 0;
+	background-position: -144px -24px;
 }
 .disabled {
 	opacity:0.5;

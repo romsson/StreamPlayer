@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"> 
 	<head>
-		<title>Basic Stream Player</title>
+		<title>Tweets Stream Player</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 		<link rel="stylesheet" type="text/css" href="../css/streamPlayer.css"/>
 		<script type="text/javascript" src="../streamPlayer.js"></script>
@@ -23,13 +23,17 @@
 			<input type="button" class="command pause" value="pause" title="play/pause"/>
 			<input type="button" class="command ff" value="fb" title="fast forward"/>		
 			<input type="button" class="command next" value="next" title="next element"/>	
+			<input type="button" class="command soundon" value="soundon" title="sound"/>	
 		</div>
 		<br/>
 		<form action="">
-			<input type="radio" name="freq" value="tweetsec" checked>One Tweet/<span id="current-speed">0</span>ms
+			<input type="radio" name="freq" value="tweetsec" checked>1 Tweet/<span id="current-speed">0</span>ms
+			<input type="radio" name="freq" value="tweetsec" disabled>1s for you/<span id="current-speed-replay">0</span>ms in the data
 		</form>
 		<br/>
 		<div>Current Tweet #: <span id="current-time">0</span>/<span id="max-time">0</span></div>
+		<div>Latest Timesamp: <span id="latest-timestamp">0</span></div>
+		<div>Current Replay Time: <span id="current-replay-time">0</span></div>
 		<br/>
 		<div id="tweets-text"></div>
 		<script type="text/javascript">
@@ -44,6 +48,7 @@
 						return div.childNodes.length;
 					},
 					current_speed: 1000,
+					current_interval: 10000,
 					max_time: tweets.length,
 					updateCallback: function() {
 						var elem = document.createElement('div');
@@ -52,6 +57,10 @@
 					},
 					refreshCallback: function() {
 						document.getElementById('current-time').innerHTML = this.current_time();
+						if(this.current_time()>0)
+							document.getElementById('latest-timestamp').innerHTML = tweets[this.current_time()-1].created_at;
+						else
+							document.getElementById('latest-timestamp').innerHTML = 0;
 					},
 					playCallback: function() {},
 					pauseCallback: function() {},
@@ -79,6 +88,9 @@
 					},
 					fbCallback: function() {
 						document.getElementById('current-speed').innerHTML = sp.current_speed;
+					},
+					soundCallback: function(state) {
+
 					}
 				});
 				document.getElementById('current-speed').innerHTML = sp.current_speed;

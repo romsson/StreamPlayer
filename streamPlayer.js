@@ -1,14 +1,14 @@
 /**
- * StreamPlayer 0.11
+ * StreamPlayer 0.12
  * Romain Vuillemot
  */
 var StreamPlayer = function(player, options) {
-	if(typeof(player) == 'string') {
+	if(typeof(player) == 'string')
 		player = document.getElementById(player);
-	}
-	if(!player) {
+
+	if(!player)
 		return;
-	}
+
 	var handle = player.getElementsByTagName('div')[0];
 	this.init(player, handle, options || {});
 	this.setup();
@@ -24,9 +24,15 @@ StreamPlayer.prototype.init = function(player, handle, options) {
 	this.nextCallback = options.nextCallback || null;		
 	this.previousCallback = options.previousCallback || null;		
 	this.ffCallback = options.ffCallback || null;
-	this.fbCallback = options.fbCallback || null;			
+	this.fbCallback = options.fbCallback || null;		
+	this.soundCallback = options.soundCallback || null;
+
 	this.refreshCallback = options.refreshCallback || this.refreshCallback;
 	this.current_time = options.current_time || null;
+	
+	this.play_mode = options.play_mode || "DATA_BY_DATA"; // "DATA_BY_TIME_INTERVAL"
+	this.read_frequency = options.read_frequency || 1000; // "DATA_BY_TIME_INTERVAL"
+	this.data_interval = options.data_interval || 1000; // "DATA_BY_TIME_INTERVAL"
 
 	this.player = player;
 	this.handle = handle;
@@ -54,8 +60,9 @@ StreamPlayer.prototype.init = function(player, handle, options) {
 
 	self = this;
 }
-	
+
 StreamPlayer.prototype.addListeners = function() {
+
 	this.player.onclick = function(e) {
 		if(e.target.className.search(/(^|\s)stop(\s|$)/) != -1 && typeof(self.stopCallback) == 'function') {
 			self.stopCallback(self);
@@ -86,7 +93,8 @@ StreamPlayer.prototype.addListeners = function() {
 		} else if(e.target.className.search(/(^|\s)ff(\s|$)/) != -1 && typeof(self.ffCallback) == 'function') {
 			if(self.current_speed>self.max_speed) {
 
-				self.current_speed = self.current_speed/2 > self.max_speed ? self.current_speed/2 : self.max_speed;
+				if(self.play_mode=="DATA_BY_DATA")
+					self.current_speed = self.current_speed/2 > self.max_speed ? self.current_speed/2 : self.max_speed;
 
 				if(self.is_playing) {
 					clearInterval(self.refreshIntervalId);
@@ -133,6 +141,15 @@ StreamPlayer.prototype.addListeners = function() {
 					e.target.disabled = true;
 				}
 			}
+		} else if(e.target.className.search(/(^|\s)soundon(\s|$)/) != -1 && typeof(self.soundCallback) == 'function') {
+			e.target.className = e.target.className.replace(/\s?soundon/g, '');
+			e.target.className += " soundoff";
+			self.soundCallback(false);
+		} else if(e.target.className.search(/(^|\s)soundoff(\s|$)/) != -1 && typeof(self.pauseCallback) == 'function') {
+			e.target.className = e.target.className.replace(/\s?soundoff/g, '');
+			e.target.className += " soundon";
+			self.soundCallback(true);
+			self.update();
 		}
 		self.refreshCallback(self);
 	}
